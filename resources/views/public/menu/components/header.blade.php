@@ -24,11 +24,11 @@
 
           @if($menu->logo)
 
-<img
-    src="{{ asset('storage/'.$menu->logo) }}"
-    alt="{{ $menu->name }}"
-    style="width:80px;height:80px;object-fit:contain;"
->
+            <img
+                src="{{ asset('storage/'.$menu->logo) }}"
+                alt="{{ $menu->name }}"
+                class="menu-logo"
+            >
 
 @endif
             <h1>
