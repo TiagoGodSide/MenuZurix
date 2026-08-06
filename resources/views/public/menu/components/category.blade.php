@@ -1,17 +1,21 @@
-<div>
+<section class="category">
 
     <h2>
         {{ $category->name }}
     </h2>
 
 
-    @foreach ($category->products as $product)
+    <div class="products-grid">
 
-        @include(
-            'public.menu.components.product-card',
-            ['product' => $product]
-        )
 
-    @endforeach
+        @foreach($category->products as $product)
 
-</div>
+            @include('public.menu.components.product-card')
+
+        @endforeach
+
+
+    </div>
+
+
+</section>

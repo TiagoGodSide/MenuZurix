@@ -1,46 +1,81 @@
-<div style="margin-bottom:20px">
+<div class="product-card">
+
 
     @if ($product->image)
-        <img
-            src="{{ asset('storage/'.$product->image->path) }}"
-            width="120"
-        >
+
+        <div class="product-image">
+
+            <img
+                src="{{ asset('storage/'.$product->image->path) }}"
+                alt="{{ $product->name }}"
+            >
+
+        </div>
+
     @endif
 
 
-    <strong>
-        {{ $product->name }}
-    </strong>
+
+    <div class="product-content">
 
 
-    @if ($product->shortDescription)
-        <p>
-            {{ $product->shortDescription }}
-        </p>
-    @endif
+        <h3>
+            {{ $product->name }}
+        </h3>
 
 
- @if ($product->hasPromotion())
 
-    <p>
-        <s>
-            R$
-            {{ number_format($product->price, 2, ',', '.') }}
-        </s>
-    </p>
+        @if ($product->shortDescription)
 
-    <strong>
-        R$
-        {{ number_format($product->promotionalPrice, 2, ',', '.') }}
-    </strong>
+            <p class="product-description">
+                {{ $product->shortDescription }}
+            </p>
 
-@else
+        @endif
 
-    <p>
-        R$
-        {{ number_format($product->price, 2, ',', '.') }}
-    </p>
 
-@endif
+
+
+        <div class="product-price">
+
+
+            @if ($product->hasPromotion())
+
+
+                <span class="old-price">
+
+                    R$
+                    {{ number_format($product->price, 2, ',', '.') }}
+
+                </span>
+
+
+                <strong class="promo-price">
+
+                    R$
+                    {{ number_format($product->promotionalPrice, 2, ',', '.') }}
+
+                </strong>
+
+
+            @else
+
+
+                <strong>
+
+                    R$
+                    {{ number_format($product->price, 2, ',', '.') }}
+
+                </strong>
+
+
+            @endif
+
+
+        </div>
+
+
+    </div>
+
 
 </div>
