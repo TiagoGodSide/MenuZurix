@@ -40,6 +40,9 @@ class PublicMenuService
             products: $category->products
                 ->map(
                     fn ($product) => new PublicProductDto(
+
+                        id: $product->id,
+                        
                         name: $product->name,
 
                         shortDescription: $product->short_description,

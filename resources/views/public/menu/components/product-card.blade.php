@@ -80,10 +80,17 @@
 
 
 
-            <button class="add-button">
-                +
-            </button>
+          <button 
+            class="add-button"
 
+            data-product-id="{{ $product->id }}"
+
+            data-product-name="{{ $product->name }}"
+
+            data-product-price="{{ $product->hasPromotion() ? $product->promotionalPrice : $product->price }}"
+        >
+            +
+        </button>
 
         </div>
 
