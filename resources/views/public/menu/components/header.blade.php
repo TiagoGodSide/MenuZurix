@@ -42,8 +42,9 @@
                 }}
             </span>
 
-          <button class="cart-placeholder" id="open-cart">
+          <button id="open-cart">
             🛒 Meu pedido
+            <span id="cart-count"></span>
         </button>
 
         </div>

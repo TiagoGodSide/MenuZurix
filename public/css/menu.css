@@ -503,6 +503,16 @@ html {
     color:#555;
 }
 
+#open-cart {
+    background: #111;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 12px 22px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
 
 
 /* ===============================
@@ -564,6 +574,26 @@ html {
 
 }
 
+#cart-count {
+
+   display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 20px;
+    height: 20px;
+
+    margin-left: 6px;
+
+    background: white;
+    color: #111;
+
+    border-radius: 50%;
+
+    font-size: 11px;
+    font-weight: 700;
+
+}
 
 /* ===============================
    RODAPÉ

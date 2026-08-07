@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
+    updateCartCount();
 
     buttons.forEach(button => {
 
@@ -61,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 JSON.stringify(cart)
             );
 
+            updateCartCount();
 
             console.log('Carrinho:', cart);
 
@@ -100,6 +102,35 @@ if (closeCartButton) {
     });
 
 }
+
+function updateCartCount() {
+
+    const cartCount = document.getElementById('cart-count');
+
+    if (!cartCount) {
+        return;
+    }
+
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    const totalItems = cart.reduce(
+        (total, item) => total + item.quantity,
+        0
+    );
+
+
+    if (totalItems > 0) {
+
+        cartCount.innerHTML = totalItems;
+
+    } else {
+
+        cartCount.innerHTML = '';
+
+    }
+
+}
+
 
 // ===============================
 // RENDERIZAR CARRINHO
