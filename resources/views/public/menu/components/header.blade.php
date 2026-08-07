@@ -48,9 +48,9 @@
             </span>
 
 
-            <span class="cart-placeholder">
-                🛒 Meu pedido
-            </span>
+          <button class="cart-placeholder" id="open-cart">
+            🛒 Meu pedido
+        </button>
 
 
         </div>

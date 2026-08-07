@@ -9,6 +9,11 @@
     ['menu' => $menu]
 )
 
+@include(
+'public.menu.components.cart'
+)
+
+
 <div class="category-sticky">
 
     <nav class="category-menu">

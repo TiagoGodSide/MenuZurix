@@ -413,6 +413,53 @@ html {
     white-space: nowrap;
 }
 
+.cart-panel {
+
+    position: fixed;
+
+    top: 0;
+    right: -400px;
+
+    width: 380px;
+    height: 100vh;
+
+    background: white;
+
+    box-shadow: -5px 0 20px rgba(0,0,0,.15);
+
+    z-index: 99999;
+
+    padding:20px;
+
+    transition:.3s;
+
+}
+
+
+.cart-panel.active {
+
+    right:0;
+
+}
+
+
+.cart-header {
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+}
+
+
+.cart-header button {
+
+    font-size:28px;
+    border:none;
+    background:none;
+    cursor:pointer;
+
+}
 
 /* =========================
    RESPONSIVIDADE
