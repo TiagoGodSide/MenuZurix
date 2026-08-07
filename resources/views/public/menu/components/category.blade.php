@@ -1,4 +1,5 @@
-<section class="category">
+<section class="category"
+id="categoria-{{ Str::slug($category->name) }}">
 
     <h2>
         {{ $category->name }}

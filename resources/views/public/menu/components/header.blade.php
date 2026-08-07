@@ -1,7 +1,5 @@
 <div class="menu-header">
 
-
-    {{-- BANNER --}}
     @if($menu->banner)
 
         <div class="menu-banner">
@@ -14,42 +12,39 @@
     @endif
 
 
-
-    {{-- INFORMAÇÕES DO RESTAURANTE --}}
     <div class="menu-info">
 
 
         <div class="menu-brand">
 
+            @if($menu->logo)
 
-          @if($menu->logo)
+                <img
+                    src="{{ asset('storage/'.$menu->logo) }}"
+                    alt="{{ $menu->name }}"
+                    class="menu-logo"
+                >
 
-            <img
-                src="{{ asset('storage/'.$menu->logo) }}"
-                alt="{{ $menu->name }}"
-                class="menu-logo"
-            >
+            @endif
 
-@endif
             <h1>
                 {{ $menu->name }}
             </h1>
 
-
         </div>
 
+       
+
+       
 
 
         <div class="menu-actions">
 
-
             <span class="{{ $menu->isOpen ? 'open' : 'closed' }}">
-
                 {{ $menu->isOpen 
                     ? '🟢 Aberto para pedidos'
                     : '🔴 Fechado'
                 }}
-
             </span>
 
 
@@ -65,3 +60,6 @@
 
 
 </div>
+
+ 
+

@@ -9,7 +9,21 @@
     ['menu' => $menu]
 )
 
+<div class="category-sticky">
 
+    <nav class="category-menu">
+
+        @foreach($menu->categories as $category)
+
+            <a href="#categoria-{{ Str::slug($category->name) }}">
+                {{ $category->name }}
+            </a>
+
+        @endforeach
+
+    </nav>
+
+</div>
 <hr>
 
 

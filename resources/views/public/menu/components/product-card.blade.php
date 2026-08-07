@@ -1,18 +1,27 @@
 <div class="product-card">
 
 
-    @if ($product->image)
+    <div class="product-image">
 
-        <div class="product-image">
+        @if ($product->image)
 
-            <img
+            <img 
                 src="{{ asset('storage/'.$product->image->path) }}"
                 alt="{{ $product->name }}"
             >
 
-        </div>
+        @endif
 
-    @endif
+
+        @if ($product->hasPromotion())
+
+            <span class="promotion-badge">
+                🔥 Promoção
+            </span>
+
+        @endif
+
+    </div>
 
 
 
@@ -35,41 +44,45 @@
 
 
 
-
-        <div class="product-price">
-
-
-            @if ($product->hasPromotion())
+        <div class="product-footer">
 
 
-                <span class="old-price">
-
-                    R$
-                    {{ number_format($product->price, 2, ',', '.') }}
-
-                </span>
+            <div class="product-price">
 
 
-                <strong class="promo-price">
+                @if ($product->hasPromotion())
 
-                    R$
-                    {{ number_format($product->promotionalPrice, 2, ',', '.') }}
-
-                </strong>
-
-
-            @else
+                    <span class="old-price">
+                        R$
+                        {{ number_format($product->price,2,',','.') }}
+                    </span>
 
 
-                <strong>
-
-                    R$
-                    {{ number_format($product->price, 2, ',', '.') }}
-
-                </strong>
+                    <strong>
+                        R$
+                        {{ number_format($product->promotionalPrice,2,',','.') }}
+                    </strong>
 
 
-            @endif
+                @else
+
+
+                    <strong>
+                        R$
+                        {{ number_format($product->price,2,',','.') }}
+                    </strong>
+
+
+                @endif
+
+
+            </div>
+
+
+
+            <button class="add-button">
+                +
+            </button>
 
 
         </div>
