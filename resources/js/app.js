@@ -1,4 +1,3 @@
-console.log('APP.JS CARREGOU');
 
 import * as bootstrap from "bootstrap";
 import "admin-lte/dist/js/adminlte.min.js";
@@ -6,17 +5,18 @@ import "admin-lte/dist/js/adminlte.min.js";
 window.bootstrap = bootstrap;
 
 
-// ===============================
+            // ===============================
 // CARRINHO DO MENU PÚBLICO
 // ===============================
 
 document.addEventListener('DOMContentLoaded', () => {
 
-
     const buttons = document.querySelectorAll('.add-button');
 
-    console.log('BOTÕES:', document.querySelectorAll('.add-button').length);
-    
+
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+
     buttons.forEach(button => {
 
 
@@ -24,13 +24,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
             const product = {
-                id: button.dataset.productId,
+
+                id: Number(button.dataset.productId),
+
                 name: button.dataset.productName,
-                price: button.dataset.productPrice
+
+                price: Number(button.dataset.productPrice)
+
             };
 
 
-            console.log('Produto adicionado:', product);
+            const existingProduct = cart.find(
+                item => item.id === product.id
+            );
+
+
+            if(existingProduct){
+
+                existingProduct.quantity++;
+
+            } else {
+
+                cart.push({
+
+                    ...product,
+
+                    quantity: 1
+
+                });
+
+            }
+
+
+            localStorage.setItem(
+                'cart',
+                JSON.stringify(cart)
+            );
+
+
+            console.log('Carrinho:', cart);
 
 
         });
