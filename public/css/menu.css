@@ -475,7 +475,7 @@ html {
     justify-content: space-between;
     align-items: center;
 
-    padding: 15px 0;
+    padding: 18px 0;
 
     border-bottom: 1px solid #eee;
 }
@@ -484,7 +484,7 @@ html {
 .cart-item-info {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 5px;
 }
 
 
@@ -495,7 +495,12 @@ html {
 
 
 .cart-item-price {
-    color: #555;
+    
+    font-size:15px;
+
+    font-weight:600;
+
+    color:#555;
 }
 
 
@@ -513,8 +518,8 @@ html {
 
 .cart-item-actions button {
 
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
 
     border-radius: 50%;
 
@@ -530,6 +535,34 @@ html {
 
 }
 
+.cart-quantity {
+
+    min-width:20px;
+
+    text-align:center;
+
+    font-weight:700;
+
+}
+
+.remove-button {
+
+    margin-left:8px;
+
+    background:#fff !important;
+
+    color:#777 !important;
+
+    border:1px solid #ddd !important;
+
+}
+
+
+.remove-button:hover {
+
+    color:red !important;
+
+}
 
 
 /* ===============================

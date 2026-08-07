@@ -139,51 +139,58 @@ function renderCart() {
 
         return `
 
-        <div class="cart-item">
-
-            <strong>
-                ${item.name}
-            </strong>
+<div class="cart-item">
 
 
-            <div class="cart-controls">
+    <div class="cart-item-info">
 
-                <button 
-                    class="decrease-button"
-                    data-id="${item.id}">
-                    -
-                </button>
+        <strong class="cart-item-name">
+            ${item.name}
+        </strong>
 
+        <span class="cart-item-price">
+            R$ ${(item.price * item.quantity).toFixed(2)}
+        </span>
 
-                <span>
-                    ${item.quantity}
-                </span>
-
-
-                <button 
-                    class="increase-button"
-                    data-id="${item.id}">
-                    +
-                </button>
-
-            </div>
+    </div>
 
 
-            <strong>
-                R$ ${(item.price * item.quantity).toFixed(2)}
-            </strong>
+
+    <div class="cart-item-actions">
 
 
-            <button 
-                class="remove-button"
-                data-id="${item.id}">
-                🗑
-            </button>
+        <button 
+            class="decrease-button"
+            data-id="${item.id}">
+            -
+        </button>
 
 
-        </div>
+        <span class="cart-quantity">
+            ${item.quantity}
+        </span>
 
-        `;
+
+        <button 
+            class="increase-button"
+            data-id="${item.id}">
+            +
+        </button>
+
+
+        <button 
+            class="remove-button"
+            data-id="${item.id}">
+            🗑
+        </button>
+
+
+    </div>
+
+
+</div>
+
+`;
 
     }).join('');
 

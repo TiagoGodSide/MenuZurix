@@ -33,11 +33,6 @@
 
         </div>
 
-       
-
-       
-
-
         <div class="menu-actions">
 
             <span class="{{ $menu->isOpen ? 'open' : 'closed' }}">
@@ -47,17 +42,13 @@
                 }}
             </span>
 
-
           <button class="cart-placeholder" id="open-cart">
             🛒 Meu pedido
         </button>
 
-
         </div>
 
-
     </div>
-
 
 </div>
 
