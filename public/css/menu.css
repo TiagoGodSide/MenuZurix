@@ -461,6 +461,130 @@ html {
 
 }
 
+/* ===============================
+   CARRINHO - ITENS
+================================ */
+
+#cart-items {
+    margin-top: 30px;
+}
+
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 15px 0;
+
+    border-bottom: 1px solid #eee;
+}
+
+
+.cart-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+
+.cart-item-name {
+    font-weight: 700;
+    font-size: 16px;
+}
+
+
+.cart-item-price {
+    color: #555;
+}
+
+
+
+/* ===============================
+   CONTROLE DE QUANTIDADE
+================================ */
+
+.cart-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+
+.cart-item-actions button {
+
+    width: 28px;
+    height: 28px;
+
+    border-radius: 50%;
+
+    border: none;
+
+    background: #111;
+
+    color:white;
+
+    cursor:pointer;
+
+    font-size:16px;
+
+}
+
+
+
+/* ===============================
+   RODAPÉ
+================================ */
+
+.cart-footer {
+
+    position:absolute;
+
+    bottom:20px;
+
+    left:20px;
+
+    right:20px;
+
+    padding-top:20px;
+
+    border-top:1px solid #eee;
+
+}
+
+
+.cart-footer strong {
+
+    display:block;
+
+    font-size:20px;
+
+    margin-bottom:15px;
+
+}
+
+
+.cart-footer button {
+
+    width:100%;
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:30px;
+
+    background:#111;
+
+    color:white;
+
+    font-size:16px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+}
 /* =========================
    RESPONSIVIDADE
 ========================= */
@@ -631,6 +755,14 @@ html {
       .category-sticky {
 
         min-height:55px;
+
+    }
+
+     .cart-panel{
+
+        width:100%;
+
+        right:-100%;
 
     }
 

@@ -1,33 +1,42 @@
-<div class="cart-header">
-
-    <h2>
-        🛒 Meu pedido
-    </h2>
-
-    <button id="close-cart">
-        ×
-    </button>
-
-</div>
+<div class="cart-panel" id="cart-panel">
 
 
-<div id="cart-items">
+    <div class="cart-header">
 
-    <p>
-        Seu pedido está vazio.
-    </p>
+        <h2>
+            🛒 Meu pedido
+        </h2>
 
-</div>
+        <button id="close-cart">
+            ×
+        </button>
+
+    </div>
 
 
-<div class="cart-footer">
 
-    <strong id="cart-total">
-        Total: R$ 0,00
-    </strong>
+    <div id="cart-items">
 
-    <button>
-        Finalizar pedido
-    </button>
+        <p>
+            Seu pedido está vazio.
+        </p>
+
+    </div>
+
+
+
+    <div class="cart-footer">
+
+        <strong id="cart-total">
+            Total: R$ 0,00
+        </strong>
+
+
+        <button>
+            Finalizar pedido
+        </button>
+
+    </div>
+
 
 </div>
