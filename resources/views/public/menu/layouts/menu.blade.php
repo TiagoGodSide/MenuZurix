@@ -22,6 +22,9 @@
 
 <body>
 
+<div id="cart-toast">
+    Produto adicionado ao pedido
+</div>
 
 @yield('content')
 

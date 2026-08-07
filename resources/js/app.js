@@ -64,6 +64,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             updateCartCount();
 
+            showCartToast(
+                ' Adicionado ao pedido'
+            );
+
             console.log('Carrinho:', cart);
 
 
@@ -123,6 +127,14 @@ function updateCartCount() {
 
         cartCount.innerHTML = totalItems;
 
+
+        cartCount.classList.remove('animate');
+
+        void cartCount.offsetWidth;
+
+        cartCount.classList.add('animate');
+
+
     } else {
 
         cartCount.innerHTML = '';
@@ -130,6 +142,36 @@ function updateCartCount() {
     }
 
 }
+
+
+function showCartToast(message) {
+
+
+    const toast = document.getElementById('cart-toast');
+
+
+    if (!toast) {
+        return;
+    }
+
+
+    toast.innerHTML = `
+        ✓ ${message}
+    `;
+
+
+    toast.classList.add('show');
+
+
+    setTimeout(() => {
+
+        toast.classList.remove('show');
+
+    }, 2000);
+
+
+}
+
 
 
 // ===============================
@@ -229,4 +271,105 @@ function renderCart() {
         Total: R$ ${total.toFixed(2)}
     `;
 
+    document.querySelectorAll('.increase-button')
+        .forEach(button => {
+
+            button.addEventListener('click', () => {
+
+                const id = Number(button.dataset.id);
+
+                const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+                const product = cart.find(
+                    item => item.id === id
+                );
+
+                if (product) {
+
+                    product.quantity++;
+
+                    saveCart(cart);
+
+                }
+
+            });
+
+        });
+
+
+    document.querySelectorAll('.decrease-button')
+        .forEach(button => {
+
+            button.addEventListener('click', () => {
+
+                const id = Number(button.dataset.id);
+
+                const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+                const product = cart.find(
+                    item => item.id === id
+                );
+
+
+                if (product) {
+
+                    product.quantity--;
+
+
+                    if (product.quantity <= 0) {
+
+                        const newCart = cart.filter(
+                            item => item.id !== id
+                        );
+
+                        saveCart(newCart);
+
+                    } else {
+
+                        saveCart(cart);
+
+                    }
+
+                }
+
+            });
+
+        });
+
+
+    document.querySelectorAll('.remove-button')
+        .forEach(button => {
+
+            button.addEventListener('click', () => {
+
+
+                const id = Number(button.dataset.id);
+
+
+                const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+
+                const newCart = cart.filter(
+                    item => item.id !== id
+                );
+
+
+                saveCart(newCart);
+
+
+            });
+
+        });
+}
+
+function saveCart(cart) {
+
+    localStorage.setItem(
+        'cart',
+        JSON.stringify(cart)
+    );
+
+    updateCartCount();
+
+    renderCart();
 }
