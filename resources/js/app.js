@@ -139,17 +139,49 @@ function renderCart() {
 
         return `
 
-            <div class="cart-item">
+        <div class="cart-item">
 
-                <strong>
-                    ${item.name}
-                </strong>
+            <strong>
+                ${item.name}
+            </strong>
 
-                <p>
-                    ${item.quantity} x R$ ${item.price.toFixed(2)}
-                </p>
+
+            <div class="cart-controls">
+
+                <button 
+                    class="decrease-button"
+                    data-id="${item.id}">
+                    -
+                </button>
+
+
+                <span>
+                    ${item.quantity}
+                </span>
+
+
+                <button 
+                    class="increase-button"
+                    data-id="${item.id}">
+                    +
+                </button>
 
             </div>
+
+
+            <strong>
+                R$ ${(item.price * item.quantity).toFixed(2)}
+            </strong>
+
+
+            <button 
+                class="remove-button"
+                data-id="${item.id}">
+                🗑
+            </button>
+
+
+        </div>
 
         `;
 
