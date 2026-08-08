@@ -725,6 +725,32 @@ TOAST DO CARRINHO
 
 }
 
+#cart-overlay {
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0,0,0,0.45);
+
+    z-index: 99998;
+
+    opacity:0;
+
+    visibility:hidden;
+
+    transition:.3s;
+
+}
+
+
+#cart-overlay.active {
+
+    opacity:1;
+
+    visibility:visible;
+
+}
 
 
 /* =========================

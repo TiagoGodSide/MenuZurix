@@ -1,3 +1,4 @@
+<div id="cart-overlay"></div>
 <div class="cart-panel" id="cart-panel">
 
 
