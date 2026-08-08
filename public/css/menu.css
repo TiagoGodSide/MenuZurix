@@ -438,6 +438,9 @@ html {
 
     transition: .3s;
 
+    display: flex;
+    flex-direction: column;
+
 }
 
 
@@ -472,6 +475,11 @@ html {
 
 #cart-items {
     margin-top: 30px;
+    overflow-y: auto;
+
+    flex: 1;
+
+    padding-right: 5px;
 }
 
 
@@ -533,8 +541,8 @@ html {
 
 .cart-item-actions button {
 
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
 
     border-radius: 50%;
 
@@ -547,6 +555,25 @@ html {
     cursor: pointer;
 
     font-size: 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: .2s;
+
+}
+
+.cart-item-actions button:hover {
+
+    transform: scale(1.08);
+
+}
+
+
+.cart-item-actions button:active {
+
+    transform: scale(.92);
 
 }
 
@@ -564,9 +591,9 @@ html {
 
     margin-left: 8px;
 
-    background: #fff !important;
+    background: white !important;
 
-    color: #777 !important;
+    color: #999 !important;
 
     border: 1px solid #ddd !important;
 
@@ -575,7 +602,11 @@ html {
 
 .remove-button:hover {
 
-    color: red !important;
+    background: #fff0f0 !important;
+
+    color: #e53935 !important;
+
+    border-color: #ffcdd2 !important;
 
 }
 
@@ -606,24 +637,24 @@ html {
 
 #cart-count.animate {
 
-animation: cartPulse .35s ease;
+    animation: cartPulse .35s ease;
 
 }
 
 
 @keyframes cartPulse {
 
-0% {
-    transform: scale(1);
-}
+    0% {
+        transform: scale(1);
+    }
 
-50% {
-    transform: scale(1.35);
-}
+    50% {
+        transform: scale(1.35);
+    }
 
-100% {
-    transform: scale(1);
-}
+    100% {
+        transform: scale(1);
+    }
 
 }
 
@@ -642,32 +673,32 @@ TOAST DO CARRINHO
 
     transform: translateX(-50%) translateY(100px);
 
-    background:#157935;
+    background: #157935;
 
-    color:white;
+    color: white;
 
-    padding:14px 25px;
+    padding: 14px 25px;
 
-    border-radius:30px;
+    border-radius: 30px;
 
-    font-weight:600;
+    font-weight: 600;
 
-    font-size:14px;
+    font-size: 14px;
 
-    opacity:0;
+    opacity: 0;
 
-    transition:.3s ease;
+    transition: .3s ease;
 
-    z-index:999999;
+    z-index: 999999;
 
 }
 
 
 #cart-toast.show {
 
-    opacity:1;
+    opacity: 1;
 
-    transform:translateX(-50%) translateY(0);
+    transform: translateX(-50%) translateY(0);
 
 }
 
@@ -677,15 +708,9 @@ TOAST DO CARRINHO
 
 .cart-footer {
 
-    position: absolute;
-
-    bottom: 20px;
-
-    left: 20px;
-
-    right: 20px;
-
     padding-top: 20px;
+
+    margin-top: 20px;
 
     border-top: 1px solid #eee;
 
@@ -731,24 +756,24 @@ TOAST DO CARRINHO
 
     inset: 0;
 
-    background: rgba(0,0,0,0.45);
+    background: rgba(0, 0, 0, 0.45);
 
     z-index: 99998;
 
-    opacity:0;
+    opacity: 0;
 
-    visibility:hidden;
+    visibility: hidden;
 
-    transition:.3s;
+    transition: .3s;
 
 }
 
 
 #cart-overlay.active {
 
-    opacity:1;
+    opacity: 1;
 
-    visibility:visible;
+    visibility: visible;
 
 }
 
