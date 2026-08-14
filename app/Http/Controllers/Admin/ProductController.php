@@ -9,11 +9,13 @@ use App\Models\Business;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Models\OptionGroup;
 use App\Services\ProductService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Throwable;
+
 
 class ProductController extends BaseAdminController
 {
@@ -107,62 +109,91 @@ class ProductController extends BaseAdminController
     }
 
     public function create(): View
-    {
-        $business = $this->currentBusiness();
+{
+    $business = $this->currentBusiness();
 
-        $categories = Category::query()
-            ->where('business_id', $business->id)
-            ->active()
-            ->ordered()
-            ->get();
+    $categories = Category::query()
+        ->where('business_id', $business->id)
+        ->active()
+        ->ordered()
+        ->get();
 
-        return view(
-            'admin.products.create',
-            compact('categories')
-        );
-    }
+    $optionGroups = OptionGroup::query()
+    ->where('business_id', $business->id)
+    ->active()
+    ->orderBy('name')
+    ->with('items')
+    ->get();
+
+   return view(
+    'admin.products.create',
+    compact('categories', 'optionGroups')
+);
+}
 
     /**
-     * @throws Throwable
-     */
-    public function store(
-        StoreProductRequest $request
-    ): RedirectResponse {
-        $business = $this->currentBusiness();
+ * @throws Throwable
+ */
+public function store(
+    StoreProductRequest $request
+): RedirectResponse {
+    $business = $this->currentBusiness();
 
-        $product = $this->productService->create(
-            $business,
-            $request->safe()->except('images'),
-            $request->file('images', [])
-        );
+    $data = $request->safe()->except([
+        'images',
+        'option_groups',
+    ]);
 
-        return redirect()
-            ->route('admin.products.edit', $product)
-            ->with('success', 'Produto cadastrado com sucesso.');
-    }
+    $optionGroups = $request->validated('option_groups', []);
 
-    public function edit(Product $product): View
-    {
-        $business = $this->currentBusiness();
-        $product = $this->ownedProduct($business, $product);
+    $product = $this->productService->create(
+        $business,
+        $data,
+        $request->file('images', []),
+        $optionGroups
+    );
 
-        $product->load([
-            'category',
-            'images',
-            'optionGroups',
-        ]);
+    return redirect()
+        ->route('admin.products.edit', $product)
+        ->with('success', 'Produto cadastrado com sucesso.');
+}
 
-        $categories = Category::query()
-            ->where('business_id', $business->id)
-            ->active()
-            ->ordered()
-            ->get();
+   public function edit(Product $product): View
+{
+    $business = $this->currentBusiness();
+    $product = $this->ownedProduct($business, $product);
 
-        return view(
-            'admin.products.edit',
-            compact('product', 'categories')
-        );
-    }
+    $product->load([
+        'category',
+        'images',
+        'optionGroups',
+    ]);
+
+    $categories = Category::query()
+        ->where('business_id', $business->id)
+        ->active()
+        ->ordered()
+        ->get();
+
+        $optionGroups = \App\Models\OptionGroup::query()
+        ->where('business_id', $business->id)
+        ->active()
+        ->with('items')
+        ->orderBy('name')
+        ->get();
+
+    $optionGroups = OptionGroup::query()
+    ->where('business_id', $business->id)
+    ->active()
+    ->orderBy('name')
+    ->with('items')
+    ->get();
+
+    return view(
+    'admin.products.edit',
+    compact('product', 'categories', 'optionGroups')
+   );
+}
 
     /**
      * @throws Throwable

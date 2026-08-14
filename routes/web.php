@@ -7,7 +7,7 @@ use App\Http\Controllers\Site\HomeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\BusinessController;
 use App\Http\Controllers\Public\MenuController;
-
+use App\Http\Controllers\Admin\OptionGroupController;
 
 /*
 |--------------------------------------------------------------------------
@@ -72,6 +72,27 @@ Route::prefix('admin')
                 [CategoryController::class, 'toggleStatus']
             )->name('categories.toggle-status');
 
+        Route::prefix('option-groups/{optionGroup}')
+            ->name('option-groups.')
+            ->group(function (): void {
+
+                Route::resource(
+                    'items',
+                    \App\Http\Controllers\Admin\OptionItemController::class
+                )
+                    ->parameters([
+                        'items' => 'optionItem',
+                    ])
+                    ->except(['show']);
+
+                Route::patch(
+                    'items/{optionItem}/toggle-status',
+                    [
+                        \App\Http\Controllers\Admin\OptionItemController::class,
+                        'toggleStatus',
+                    ]
+                )->name('items.toggle-status');
+            });
             Route::patch(
                 '/products/{product}/toggle-status',
                 [ProductController::class, 'toggleStatus']
@@ -107,6 +128,14 @@ Route::prefix('admin')
 
             Route::resource('categories', CategoryController::class)
                 ->except('show');
+
+            Route::patch(
+                    '/option-groups/{optionGroup}/toggle-status',
+                    [OptionGroupController::class, 'toggleStatus']
+                )->name('option-groups.toggle-status');
+
+            Route::resource('option-groups', OptionGroupController::class)
+                 ->except('show');
 
             Route::post('/logout', [AuthController::class, 'destroy'])
                 ->name('logout');

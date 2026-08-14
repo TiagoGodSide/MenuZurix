@@ -7,7 +7,7 @@ class PublicProductDto
     public function __construct(
 
         public readonly int $id,
-        
+
         public readonly string $name,
 
         public readonly ?string $shortDescription,
@@ -25,9 +25,10 @@ class PublicProductDto
         public readonly bool $isAvailable,
 
         public readonly ?PublicProductImageDto $image,
+
+        public readonly array $optionGroups = [],
     ) {
     }
-
 
     public function hasPromotion(): bool
     {

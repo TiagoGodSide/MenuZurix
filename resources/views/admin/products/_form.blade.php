@@ -225,6 +225,203 @@
 
         </div>
 
+                {{-- Grupos de opções --}}
+        <div class="card content-card mb-4">
+
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="bi bi-ui-checks-grid me-2"></i>
+                    Grupos de opções
+                </h3>
+            </div>
+
+            <div class="card-body">
+
+                <div class="form-text mb-3">
+                    Selecione os grupos de opções disponíveis para este produto
+                    e defina quantas escolhas o cliente poderá fazer.
+                </div>
+
+                @if ($optionGroups->isEmpty())
+
+                    <div class="alert alert-light border mb-0">
+                        <div class="d-flex align-items-start gap-2">
+                            <i class="bi bi-info-circle text-muted"></i>
+
+                            <div>
+                                <strong>Nenhum grupo de opções disponível.</strong>
+
+                                <div class="small text-muted mt-1">
+                                    Cadastre um grupo de opções antes de
+                                    vinculá-lo a este produto.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                @else
+
+                    @php
+                        $selectedOptionGroups = collect(
+                            old(
+                                'option_groups',
+                                $editing
+                                    ? $product->optionGroups
+                                        ->mapWithKeys(
+                                            fn ($group) => [
+                                                $group->id => [
+                                                    'id' => $group->id,
+                                                    'min_choices' =>
+                                                        $group->pivot->min_choices,
+                                                    'max_choices' =>
+                                                        $group->pivot->max_choices,
+                                                    'sort_order' =>
+                                                        $group->pivot->sort_order,
+                                                ],
+                                            ]
+                                        )
+                                        ->toArray()
+                                    : []
+                            )
+                        );
+                    @endphp
+
+                    <div class="d-flex flex-column gap-3">
+
+                        @foreach ($optionGroups as $group)
+
+                            @php
+                                $selected = $selectedOptionGroups->has(
+                                    $group->id
+                                );
+
+                                $groupData = $selectedOptionGroups->get(
+                                    $group->id,
+                                    []
+                                );
+                            @endphp
+
+                            <div class="border rounded p-3">
+
+                                <div class="form-check">
+
+                                    <input
+                                        type="checkbox"
+                                        name="option_groups[{{ $group->id }}][id]"
+                                        value="{{ $group->id }}"
+                                        id="option-group-{{ $group->id }}"
+                                        class="form-check-input option-group-checkbox"
+                                        @checked($selected)
+                                    >
+
+                                    <label
+                                        for="option-group-{{ $group->id }}"
+                                        class="form-check-label fw-semibold"
+                                    >
+                                        {{ $group->name }}
+                                    </label>
+
+                                </div>
+
+                                @if ($group->description)
+                                    <div class="small text-muted ms-4 mt-1">
+                                        {{ $group->description }}
+                                    </div>
+                                @endif
+
+                                <div
+                                    class="option-group-settings mt-3 ms-4"
+                                    data-group-settings="{{ $group->id }}"
+                                    @style([
+                                        'display: grid;' => $selected,
+                                        'display: none;' => ! $selected,
+                                    ])
+                                >
+
+                                    <div class="row g-3">
+
+                                        <div class="col-md-4">
+
+                                            <label
+                                                for="option-group-{{ $group->id }}-min"
+                                                class="form-label"
+                                            >
+                                                Mínimo de escolhas
+                                            </label>
+
+                                            <input
+                                                type="number"
+                                                name="option_groups[{{ $group->id }}][min_choices]"
+                                                id="option-group-{{ $group->id }}-min"
+                                                min="0"
+                                                max="999"
+                                                value="{{ $groupData['min_choices'] ?? 0 }}"
+                                                class="form-control"
+                                            >
+
+                                        </div>
+
+                                        <div class="col-md-4">
+
+                                            <label
+                                                for="option-group-{{ $group->id }}-max"
+                                                class="form-label"
+                                            >
+                                                Máximo de escolhas
+                                            </label>
+
+                                            <input
+                                                type="number"
+                                                name="option_groups[{{ $group->id }}][max_choices]"
+                                                id="option-group-{{ $group->id }}-max"
+                                                min="0"
+                                                max="999"
+                                                value="{{ $groupData['max_choices'] ?? '' }}"
+                                                placeholder="Sem limite"
+                                                class="form-control"
+                                            >
+
+                                        </div>
+
+                                        <div class="col-md-4">
+
+                                            <label
+                                                for="option-group-{{ $group->id }}-order"
+                                                class="form-label"
+                                            >
+                                                Ordem
+                                            </label>
+
+                                            <input
+                                                type="number"
+                                                name="option_groups[{{ $group->id }}][sort_order]"
+                                                id="option-group-{{ $group->id }}-order"
+                                                min="0"
+                                                max="99999"
+                                                value="{{ $groupData['sort_order'] ?? $loop->index }}"
+                                                class="form-control"
+                                            >
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        @endforeach
+
+                    </div>
+
+                @endif
+
+            </div>
+
+        </div>
+
+        {{-- Imagens --}}
+
         {{-- Imagens --}}
         <div class="card content-card mb-4">
             <div class="card-header">
@@ -445,3 +642,38 @@
 
     </div>
 </div>
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        document
+            .querySelectorAll('.option-group-checkbox')
+            .forEach((checkbox) => {
+
+                const groupId = checkbox.value;
+
+                const settings = document.querySelector(
+                    `[data-group-settings="${groupId}"]`
+                );
+
+                if (!settings) {
+                    return;
+                }
+
+                const updateVisibility = () => {
+                    settings.style.display = checkbox.checked
+                        ? 'grid'
+                        : 'none';
+                };
+
+                checkbox.addEventListener(
+                    'change',
+                    updateVisibility
+                );
+
+                updateVisibility();
+            });
+
+    });
+</script>
+@endpush

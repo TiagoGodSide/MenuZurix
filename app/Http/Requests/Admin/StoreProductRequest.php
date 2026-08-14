@@ -150,7 +150,50 @@ class StoreProductRequest extends FormRequest
                 'mimes:jpg,jpeg,png,webp',
                 'max:4096',
             ],
-        ];
+
+            'option_groups' => [
+                        'nullable',
+                        'array',
+                    ],
+
+                    'option_groups.*' => [
+                        'array',
+                    ],
+
+                    'option_groups.*.id' => [
+                        'required',
+                        'integer',
+                        'distinct',
+                        Rule::exists('option_groups', 'id')
+                            ->where(
+                                fn ($query) => $query
+                                    ->where('business_id', $business->id)
+                                    ->where('is_active', true)
+                            ),
+                    ],
+
+                    'option_groups.*.min_choices' => [
+                        'required',
+                        'integer',
+                        'min:0',
+                        'max:999',
+                    ],
+
+                    'option_groups.*.max_choices' => [
+                        'nullable',
+                        'integer',
+                        'min:0',
+                        'max:999',
+                        'gte:option_groups.*.min_choices',
+                    ],
+
+                    'option_groups.*.sort_order' => [
+                        'required',
+                        'integer',
+                        'min:0',
+                        'max:99999',
+                    ],
+                    ];
     }
 
     public function messages(): array
@@ -193,6 +236,37 @@ class StoreProductRequest extends FormRequest
             'images.*.image' => 'Cada arquivo precisa ser uma imagem.',
             'images.*.mimes' => 'As imagens devem ser JPG, PNG ou WebP.',
             'images.*.max' => 'Cada imagem deve possuir no máximo 4 MB.',
+
+            'option_groups.array' =>
+                'Os grupos de opções enviados são inválidos.',
+
+            'option_groups.*.id.required' =>
+                'Selecione um grupo de opções válido.',
+
+            'option_groups.*.id.exists' =>
+                'O grupo de opções selecionado não está disponível.',
+
+            'option_groups.*.min_choices.required' =>
+                'Informe a quantidade mínima de escolhas.',
+
+            'option_groups.*.min_choices.integer' =>
+                'A quantidade mínima de escolhas deve ser um número inteiro.',
+
+            'option_groups.*.min_choices.min' =>
+                'A quantidade mínima de escolhas não pode ser negativa.',
+
+            'option_groups.*.max_choices.integer' =>
+                'A quantidade máxima de escolhas deve ser um número inteiro.',
+
+            'option_groups.*.max_choices.min' =>
+                'A quantidade máxima de escolhas não pode ser negativa.',
+
+            'option_groups.*.sort_order.integer' =>
+                'A ordem do grupo deve ser um número inteiro.',
+
+            'option_groups.*.max_choices.gte' =>
+                'O máximo de escolhas deve ser igual ou maior que o mínimo.',
+
         ];
     }
 

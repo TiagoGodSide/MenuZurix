@@ -166,6 +166,7 @@
                                 class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}"
                             >
                                 <i class="nav-icon bi bi-box-seam"></i>
+                                
                                 <p>Produtos</p>
                             </a>
                         </li>
@@ -178,7 +179,17 @@
                                     'admin.categories.*'
                                 ) ? 'active' : '' }}"
                         >
-                            <i class="nav-icon bi bi-tags"></i>
+                          
+
+                                                        <a
+                                href="{{ route('admin.option-groups.index') }}"
+                                class="{{ request()->routeIs('admin.option-groups.*')
+                                    ? 'active'
+                                    : '' }}"
+                            >
+                                <i class="bi bi-ui-checks-grid"></i>
+                                <span>Grupos de opções</span>
+                            </a>
 
                             <p>Categorias</p>
                         </a>

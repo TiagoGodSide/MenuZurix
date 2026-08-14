@@ -42,7 +42,16 @@ class ProductService
                     $data['name']
                 );
 
+                $optionGroups = $data['option_groups'] ?? [];
+
+                unset($data['option_groups']);
+
                 $product = Product::create($data);
+
+                $this->syncOptionGroups(
+                    $product,
+                    $optionGroups
+                );
 
                 foreach ($images as $index => $image) {
                     $path = $this->fileUploadService->storeImage(
@@ -59,10 +68,9 @@ class ProductService
                         'is_primary' => $index === 0,
                     ]);
                 }
-
-                return $product->load([
-                    'category',
-                    'images',
+                    return $product->load([
+                        'category',
+                        'images',
                 ]);
             });
         } catch (Throwable $exception) {
@@ -102,8 +110,16 @@ class ProductService
                         $product
                     );
                 }
+                $optionGroups = $data['option_groups'] ?? [];
+
+                unset($data['option_groups']);
 
                 $product->update($data);
+
+                $this->syncOptionGroups(
+                    $product,
+                    $optionGroups
+                );
 
                 $nextOrder = (int) $product->images()
                     ->max('sort_order') + 1;
@@ -287,6 +303,30 @@ class ProductService
                 'is_primary' => true,
             ]);
         });
+    }
+
+    private function syncOptionGroups(
+        Product $product,
+        array $optionGroups
+    ): void {
+        $syncData = [];
+
+
+        foreach ($optionGroups as $group) {
+            if (! isset($group['id'])) {
+                continue;
+            }
+
+            $syncData[(int) $group['id']] = [
+                'min_choices' => (int) ($group['min_choices'] ?? 0),
+                'max_choices' => filled($group['max_choices'] ?? null)
+                    ? (int) $group['max_choices']
+                    : null,
+                'sort_order' => (int) ($group['sort_order'] ?? 0),
+            ];
+        }
+
+        $product->optionGroups()->sync($syncData);
     }
 
     private function generateUniqueSlug(

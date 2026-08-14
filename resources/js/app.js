@@ -13,16 +13,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const buttons = document.querySelectorAll('.add-button');
 
-
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-
     updateCartCount();
 
     buttons.forEach(button => {
 
-
         button.addEventListener('click', () => {
-
 
             const product = {
 
@@ -34,91 +29,527 @@ document.addEventListener('DOMContentLoaded', () => {
 
             };
 
+            let optionGroups = [];
 
-            const existingProduct = cart.find(
-                item => item.id === product.id
-            );
+            try {
 
+                optionGroups = JSON.parse(
+                    button.dataset.optionGroups || '[]'
+                );
 
-            if (existingProduct) {
+            } catch (error) {
 
-                existingProduct.quantity++;
+                console.error(
+                    'Erro ao carregar opções do produto:',
+                    error
+                );
 
-            } else {
-
-                cart.push({
-
-                    ...product,
-
-                    quantity: 1
-
-                });
+                optionGroups = [];
 
             }
 
+            /*
+             * Produto sem opções:
+             * continua entrando diretamente no carrinho.
+             */
+            if (!optionGroups.length) {
 
-            localStorage.setItem(
-                'cart',
-                JSON.stringify(cart)
+                addProductToCart(product);
+
+                return;
+
+            }
+
+            /*
+             * Produto com opções:
+             * abre a tela de personalização.
+             */
+            openProductOptionsModal(
+                product,
+                optionGroups
             );
-
-            updateCartCount();
-
-            showCartToast(
-                ' Adicionado ao pedido'
-            );
-
-            console.log('Carrinho:', cart);
-
 
         });
 
-
     });
-
 
 });
 
-const openCartButton = document.getElementById('open-cart');
-const closeCartButton = document.getElementById('close-cart');
-const cartPanel = document.getElementById('cart-panel');
-const cartOverlay = document.getElementById('cart-overlay');
 
-if (openCartButton) {
 
-    openCartButton.addEventListener('click', () => {
+function addProductToCart(product, options = []) {
 
-        renderCart();
+    let cart = JSON.parse(
+        localStorage.getItem('cart')
+    ) || [];
 
-        cartPanel.classList.add('active');
-        cartOverlay.classList.add('active');
-    });
+    const optionsPrice = options.reduce(
+        (total, option) =>
+            total + (
+                Number(option.additionalPrice)
+                * Number(option.quantity)
+            ),
+        0
+    );
 
+    const finalPrice =
+        Number(product.price) + optionsPrice;
+
+    const optionsKey = options
+        .map(option =>
+            `${option.uuid}:${option.quantity}`
+        )
+        .sort()
+        .join('|');
+
+    const cartKey =
+        `${product.id}:${optionsKey}`;
+
+    const existingProduct = cart.find(
+        item => item.cartKey === cartKey
+    );
+
+    if (existingProduct) {
+
+        existingProduct.quantity++;
+
+    } else {
+
+        cart.push({
+
+            ...product,
+
+            price: finalPrice,
+
+            basePrice: Number(product.price),
+
+            options: options,
+
+            cartKey: cartKey,
+
+            quantity: 1
+
+        });
+
+    }
+
+    localStorage.setItem(
+        'cart',
+        JSON.stringify(cart)
+    );
+
+    updateCartCount();
+
+    showCartToast(
+        'Adicionado ao pedido'
+    );
+
+    console.log(
+        'Carrinho:',
+        cart
+    );
 }
 
+function openProductOptionsModal(product, optionGroups) {
 
-if (closeCartButton) {
+    const oldModal = document.getElementById(
+        'product-options-modal'
+    );
 
-    closeCartButton.addEventListener('click', () => {
+    if (oldModal) {
+        oldModal.remove();
+    }
 
-        cartPanel.classList.remove('active');
-        cartOverlay.classList.remove('active');
+    const modal = document.createElement('div');
+
+    modal.id = 'product-options-modal';
+
+    modal.innerHTML = `
+
+        <div class="product-options-overlay"></div>
+
+        <div class="product-options-dialog">
+
+            <button
+                type="button"
+                class="product-options-close"
+                id="close-product-options"
+            >
+                ×
+            </button>
+
+            <h2>
+                ${product.name}
+            </h2>
+
+            <p class="product-options-price">
+                R$ ${Number(product.price).toFixed(2)}
+            </p>
+
+            <div
+                id="product-options-content"
+            ></div>
+
+            <div class="product-options-footer">
+
+                <strong id="product-options-total">
+                    Total: R$ ${Number(product.price).toFixed(2)}
+                </strong>
+
+                <button
+                    type="button"
+                    id="confirm-product-options"
+                    class="product-options-confirm"
+                >
+                    Adicionar ao pedido
+                </button>
+
+            </div>
+
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    const content = document.getElementById(
+        'product-options-content'
+    );
+
+    optionGroups.forEach((group, groupIndex) => {
+
+        const groupElement =
+            document.createElement('section');
+
+        groupElement.className =
+            'product-option-group';
+
+        const minimum =
+            Number(group.minChoices || 0);
+
+        const maximum =
+            Number(group.maxChoices || 0);
+
+        groupElement.innerHTML = `
+
+            <div class="product-option-group-header">
+
+                <h3>
+                    ${group.name}
+                </h3>
+
+                ${
+                    group.description
+                        ? `<p>${group.description}</p>`
+                        : ''
+                }
+
+                <small>
+                    ${
+                        minimum > 0
+                            ? `Escolha no mínimo ${minimum}.`
+                            : ''
+                    }
+
+                    ${
+                        maximum > 0
+                            ? `Escolha até ${maximum}.`
+                            : ''
+                    }
+                </small>
+
+            </div>
+
+            <div class="product-option-items"></div>
+        `;
+
+        const itemsContainer =
+            groupElement.querySelector(
+                '.product-option-items'
+            );
+
+        const isSingle =
+            group.selectionType === 'single';
+
+        group.items.forEach(item => {
+
+            const wrapper =
+                document.createElement('label');
+
+            wrapper.className =
+                'product-option-item';
+
+            wrapper.innerHTML = `
+
+                <div class="product-option-main">
+
+                    <input
+                        type="${isSingle ? 'radio' : 'checkbox'}"
+                        name="option-group-${groupIndex}"
+                        value="${item.uuid}"
+                        data-name="${item.name}"
+                        data-price="${item.additionalPrice}"
+                        data-max-quantity="${item.maxQuantity}"
+                    >
+
+                    <span>
+                        <strong>
+                            ${item.name}
+                        </strong>
+
+                        ${
+                            item.description
+                                ? `<small>${item.description}</small>`
+                                : ''
+                        }
+                    </span>
+
+                </div>
+
+                <span class="product-option-price">
+                    ${
+                        Number(item.additionalPrice) > 0
+                            ? `+ R$ ${Number(item.additionalPrice).toFixed(2)}`
+                            : 'Grátis'
+                    }
+                </span>
+            `;
+
+            itemsContainer.appendChild(wrapper);
+
+        });
+
+        content.appendChild(groupElement);
+
     });
 
+    updateProductOptionsTotal(product);
+
+    document
+        .querySelectorAll(
+            '#product-options-content input'
+        )
+        .forEach(input => {
+
+            input.addEventListener(
+                'change',
+                () => {
+
+                    updateProductOptionsTotal(
+                        product
+                    );
+
+                }
+            );
+
+        });
+
+    document
+        .getElementById('close-product-options')
+        .addEventListener(
+            'click',
+            () => modal.remove()
+        );
+
+    document
+        .querySelector(
+            '.product-options-overlay'
+        )
+        .addEventListener(
+            'click',
+            () => modal.remove()
+        );
+
+    document
+        .getElementById('confirm-product-options')
+        .addEventListener(
+            'click',
+            () => {
+
+                const selected =
+                    getSelectedProductOptions();
+
+                const validation =
+                    validateProductOptions(
+                        optionGroups,
+                        selected
+                    );
+
+                if (!validation.valid) {
+
+                    alert(validation.message);
+
+                    return;
+
+                }
+
+                addProductToCart(
+                    product,
+                    selected
+                );
+
+                modal.remove();
+
+            }
+        );
 }
 
-if (cartOverlay) {
+function getSelectedProductOptions() {
 
-    cartOverlay.addEventListener('click', () => {
+    const selected = [];
 
-        cartPanel.classList.remove('active');
+    document
+        .querySelectorAll(
+            '#product-options-content input:checked'
+        )
+        .forEach(input => {
 
-        cartOverlay.classList.remove('active');
+            selected.push({
 
-    });
+                uuid: input.value,
 
+                name: input.dataset.name,
+
+                additionalPrice:
+                    Number(input.dataset.price),
+
+                quantity: 1
+
+            });
+
+        });
+
+    return selected;
 }
 
+function validateProductOptions(optionGroups, selected) {
+
+    for (const group of optionGroups) {
+
+        const groupItemUuids = new Set(
+            group.items.map(item => item.uuid)
+        );
+
+        const selectedInGroup = selected.filter(option =>
+            groupItemUuids.has(option.uuid)
+        );
+
+        const minimum = Number(group.minChoices || 0);
+        const maximum = Number(group.maxChoices || 0);
+
+        if (
+            minimum > 0 &&
+            selectedInGroup.length < minimum
+        ) {
+            return {
+                valid: false,
+                message:
+                    `Selecione pelo menos ${minimum} opção(ões) em "${group.name}".`
+            };
+        }
+
+        if (
+            maximum > 0 &&
+            selectedInGroup.length > maximum
+        ) {
+            return {
+                valid: false,
+                message:
+                    `Você pode selecionar no máximo ${maximum} opção(ões) em "${group.name}".`
+            };
+        }
+    }
+
+    return {
+        valid: true
+    };
+}
+
+function updateProductOptionsTotal(product) {
+
+    const selected =
+        getSelectedProductOptions();
+
+    const optionsPrice =
+        selected.reduce(
+            (total, option) =>
+                total +
+                Number(option.additionalPrice),
+            0
+        );
+
+    const total =
+        Number(product.price) +
+        optionsPrice;
+
+    const totalElement =
+        document.getElementById(
+            'product-options-total'
+        );
+
+    if (totalElement) {
+
+        totalElement.textContent =
+            `Total: R$ ${total.toFixed(2)}`;
+
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    const openCartButton =
+        document.getElementById('open-cart');
+
+    const closeCartButton =
+        document.getElementById('close-cart');
+
+    const cartPanel =
+        document.getElementById('cart-panel');
+
+    const cartOverlay =
+        document.getElementById('cart-overlay');
+
+
+    if (openCartButton && cartPanel && cartOverlay) {
+
+        openCartButton.addEventListener('click', () => {
+
+            renderCart();
+
+            cartPanel.classList.add('active');
+
+            cartOverlay.classList.add('active');
+
+        });
+
+    }
+
+
+    if (closeCartButton && cartPanel && cartOverlay) {
+
+        closeCartButton.addEventListener('click', () => {
+
+            cartPanel.classList.remove('active');
+
+            cartOverlay.classList.remove('active');
+
+        });
+
+    }
+
+
+    if (cartOverlay && cartPanel) {
+
+        cartOverlay.addEventListener('click', () => {
+
+            cartPanel.classList.remove('active');
+
+            cartOverlay.classList.remove('active');
+
+        });
+
+    }
+
+});
 function updateCartCount() {
 
     const cartCount = document.getElementById('cart-count');
@@ -184,22 +615,31 @@ function showCartToast(message) {
 
 }
 
-
-
 // ===============================
 // RENDERIZAR CARRINHO
 // ===============================
 
 function renderCart() {
 
-    const cartItems = document.getElementById('cart-items');
-    const cartTotal = document.querySelector('.cart-footer strong');
+    const cartItems =
+        document.getElementById('cart-items');
 
+    const cartTotal =
+        document.getElementById('cart-total');
 
     if (!cartItems || !cartTotal) {
         return;
     }
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    const cart =
+        JSON.parse(
+            localStorage.getItem('cart')
+        ) || [];
+
+
+    /*
+     * CARRINHO VAZIO
+     */
 
     if (cart.length === 0) {
 
@@ -209,130 +649,315 @@ function renderCart() {
             </p>
         `;
 
-        cartTotal.innerHTML = `
-            Total: R$ 0,00
-        `;
+        cartTotal.textContent =
+            'Total: R$ 0,00';
 
         return;
     }
 
+
     let total = 0;
+
+
+    /*
+     * RENDERIZA OS PRODUTOS
+     */
 
     cartItems.innerHTML = cart.map(item => {
 
-        total += item.price * item.quantity;
+        const itemPrice =
+            Number(item.price || 0);
+
+        const basePrice =
+            Number(
+                item.basePrice ??
+                item.price ??
+                0
+            );
+
+        const quantity =
+            Number(item.quantity || 1);
+
+        const subtotal =
+            itemPrice * quantity;
+
+        total += subtotal;
+
+
+        /*
+         * ACOMPANHAMENTOS
+         */
+
+        let optionsHtml = '';
+
+        if (
+            Array.isArray(item.options) &&
+            item.options.length > 0
+        ) {
+
+            optionsHtml = `
+                <div class="cart-item-options">
+
+                    <strong>
+                        Acompanhamentos:
+                    </strong>
+
+                    ${item.options.map(option => {
+
+                        const optionPrice =
+                            Number(
+                                option.additionalPrice || 0
+                            );
+
+                        const optionQuantity =
+                            Number(
+                                option.quantity || 1
+                            );
+
+                        return `
+                            <div class="cart-option">
+
+                                <span>
+                                    ${option.name}
+
+                                    ${
+                                        optionQuantity > 1
+                                            ? ` × ${optionQuantity}`
+                                            : ''
+                                    }
+                                </span>
+
+                                ${
+                                    optionPrice > 0
+                                        ? `
+                                            <span>
+                                                + R$
+                                                ${(
+                                                    optionPrice *
+                                                    optionQuantity
+                                                )
+                                                .toFixed(2)
+                                                .replace('.', ',')}
+                                            </span>
+                                          `
+                                        : `
+                                            <span>
+                                                Grátis
+                                            </span>
+                                          `
+                                }
+
+                            </div>
+                        `;
+
+                    }).join('')}
+
+                </div>
+            `;
+
+        }
+
+
+        /*
+         * PRODUTO
+         */
 
         return `
 
-<div class="cart-item">
+            <div class="cart-item">
+
+                <div class="cart-item-info">
+
+                    <strong class="cart-item-name">
+                        ${item.name}
+                    </strong>
 
 
-    <div class="cart-item-info">
-
-        <strong class="cart-item-name">
-            ${item.name}
-        </strong>
-
-        <span class="cart-item-price">
-            R$ ${(item.price * item.quantity).toFixed(2)}
-        </span>
-
-    </div>
-
-
-
-    <div class="cart-item-actions">
+                    ${
+                        item.options?.length
+                            ? `
+                                <span class="cart-item-base-price">
+                                    Produto:
+                                    R$ ${basePrice
+                                        .toFixed(2)
+                                        .replace('.', ',')}
+                                </span>
+                              `
+                            : ''
+                    }
 
 
-        <button 
-            class="decrease-button"
-            data-id="${item.id}">
-            -
-        </button>
+                    <span class="cart-item-unit">
+
+                        R$
+                        ${itemPrice
+                            .toFixed(2)
+                            .replace('.', ',')}
+
+                        cada
+
+                    </span>
 
 
-        <span class="cart-quantity">
-            ${item.quantity}
-        </span>
+                    ${optionsHtml}
 
 
-        <button 
-            class="increase-button"
-            data-id="${item.id}">
-            +
-        </button>
+                    <span class="cart-item-subtotal">
+
+                        Subtotal:
+                        R$
+                        ${subtotal
+                            .toFixed(2)
+                            .replace('.', ',')}
+
+                    </span>
+
+                </div>
 
 
-        <button 
-            class="remove-button"
-            data-id="${item.id}">
-            🗑
-        </button>
+                <div class="cart-item-actions">
+
+                    <button
+                        type="button"
+                        class="decrease-button"
+                        data-cart-key="${item.cartKey || item.id}"
+                    >
+                        -
+                    </button>
 
 
-    </div>
+                    <span class="cart-quantity">
+                        ${quantity}
+                    </span>
 
 
-</div>
+                    <button
+                        type="button"
+                        class="increase-button"
+                        data-cart-key="${item.cartKey || item.id}"
+                    >
+                        +
+                    </button>
 
-`;
+
+                    <button
+                        type="button"
+                        class="remove-button"
+                        data-cart-key="${item.cartKey || item.id}"
+                    >
+                        🗑
+                    </button>
+
+                </div>
+
+            </div>
+
+        `;
 
     }).join('');
 
-    cartTotal.innerHTML = `
-        Total: R$ ${total.toFixed(2)}
-    `;
 
-    document.querySelectorAll('.increase-button')
+    /*
+     * TOTAL DO PEDIDO
+     */
+
+    cartTotal.textContent =
+        `Total: R$ ${total
+            .toFixed(2)
+            .replace('.', ',')}`;
+
+
+    /*
+     * BOTÃO +
+     */
+
+    document
+        .querySelectorAll('.increase-button')
         .forEach(button => {
 
-            button.addEventListener('click', () => {
+            button.addEventListener(
+                'click',
+                () => {
 
-                const id = Number(button.dataset.id);
+                    const cartKey =
+                        button.dataset.cartKey;
 
-                const cart = JSON.parse(localStorage.getItem('cart')) || [];
+                    const cart =
+                        JSON.parse(
+                            localStorage.getItem('cart')
+                        ) || [];
 
-                const product = cart.find(
-                    item => item.id === id
-                );
 
-                if (product) {
+                    const product =
+                        cart.find(
+                            item =>
+                                String(
+                                    item.cartKey || item.id
+                                ) === String(cartKey)
+                        );
 
-                    product.quantity++;
 
-                    saveCart(cart);
+                    if (product) {
+
+                        product.quantity++;
+
+                        saveCart(cart);
+
+                    }
 
                 }
-
-            });
+            );
 
         });
 
 
-    document.querySelectorAll('.decrease-button')
+    /*
+     * BOTÃO -
+     */
+
+    document
+        .querySelectorAll('.decrease-button')
         .forEach(button => {
 
-            button.addEventListener('click', () => {
+            button.addEventListener(
+                'click',
+                () => {
 
-                const id = Number(button.dataset.id);
+                    const cartKey =
+                        button.dataset.cartKey;
 
-                const cart = JSON.parse(localStorage.getItem('cart')) || [];
+                    const cart =
+                        JSON.parse(
+                            localStorage.getItem('cart')
+                        ) || [];
 
-                const product = cart.find(
-                    item => item.id === id
-                );
+
+                    const product =
+                        cart.find(
+                            item =>
+                                String(
+                                    item.cartKey || item.id
+                                ) === String(cartKey)
+                        );
 
 
-                if (product) {
+                    if (!product) {
+                        return;
+                    }
+
 
                     product.quantity--;
 
 
                     if (product.quantity <= 0) {
 
-                        const newCart = cart.filter(
-                            item => item.id !== id
-                        );
+                        const newCart =
+                            cart.filter(
+                                item =>
+                                    String(
+                                        item.cartKey || item.id
+                                    ) !== String(cartKey)
+                            );
 
                         saveCart(newCart);
 
@@ -343,35 +968,48 @@ function renderCart() {
                     }
 
                 }
-
-            });
+            );
 
         });
 
 
-    document.querySelectorAll('.remove-button')
+    /*
+     * BOTÃO EXCLUIR
+     */
+
+    document
+        .querySelectorAll('.remove-button')
         .forEach(button => {
 
-            button.addEventListener('click', () => {
+            button.addEventListener(
+                'click',
+                () => {
+
+                    const cartKey =
+                        button.dataset.cartKey;
+
+                    const cart =
+                        JSON.parse(
+                            localStorage.getItem('cart')
+                        ) || [];
 
 
-                const id = Number(button.dataset.id);
+                    const newCart =
+                        cart.filter(
+                            item =>
+                                String(
+                                    item.cartKey || item.id
+                                ) !== String(cartKey)
+                        );
 
 
-                const cart = JSON.parse(localStorage.getItem('cart')) || [];
+                    saveCart(newCart);
 
-
-                const newCart = cart.filter(
-                    item => item.id !== id
-                );
-
-
-                saveCart(newCart);
-
-
-            });
+                }
+            );
 
         });
+
 }
 
 function saveCart(cart) {

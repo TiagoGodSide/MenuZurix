@@ -78,20 +78,19 @@
 
             </div>
 
-
-
-          <button 
-            class="add-button"
-
-            data-product-id="{{ $product->id }}"
-
-            data-product-name="{{ $product->name }}"
-
-            data-product-price="{{ $product->hasPromotion() ? $product->promotionalPrice : $product->price }}"
-        >
-            +
-        </button>
-
+            <button
+                type="button"
+                class="add-button"
+                data-product-id="{{ $product->id }}"
+                data-product-name="{{ $product->name }}"
+                data-product-price="{{ $product->hasPromotion() ? $product->promotionalPrice : $product->price }}"
+                data-option-groups="{{ json_encode(
+                    $product->optionGroups,
+                    JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT
+                ) }}"
+            >
+                +
+            </button>
         </div>
 
 

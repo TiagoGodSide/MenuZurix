@@ -485,8 +485,12 @@ html {
 
 .cart-item {
     display: flex;
+
     justify-content: space-between;
+
     align-items: center;
+
+    gap: 15px;
 
     padding: 18px 0;
 
@@ -496,16 +500,44 @@ html {
 
 .cart-item-info {
     display: flex;
+
     flex-direction: column;
-    gap: 5px;
+
+    gap: 4px;
+
+    flex: 1;
+
+    min-width: 0;
 }
 
 
 .cart-item-name {
+
     font-weight: 700;
+
     font-size: 16px;
+
+    line-height: 1.2;
 }
 
+.cart-item-unit {
+
+    font-size: 14px;
+
+    color: #777;
+
+}
+
+
+.cart-item-subtotal {
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    color: #222;
+
+}
 
 .cart-item-price {
 
@@ -534,8 +566,12 @@ html {
 
 .cart-item-actions {
     display: flex;
+
     align-items: center;
-    gap: 8px;
+
+    gap: 6px;
+
+    flex-shrink: 0;
 }
 
 
@@ -591,22 +627,35 @@ html {
 
     margin-left: 8px;
 
-    background: white !important;
+    width: 32px;
+    height: 32px;
+
+    border-radius: 50%;
+
+    background: #fff !important;
 
     color: #999 !important;
 
     border: 1px solid #ddd !important;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    transition: .2s;
 
 }
 
 
 .remove-button:hover {
 
-    background: #fff0f0 !important;
-
     color: #e53935 !important;
 
-    border-color: #ffcdd2 !important;
+    border-color: #e53935 !important;
+
+    background: #fff5f5 !important;
 
 }
 
@@ -777,6 +826,552 @@ TOAST DO CARRINHO
 
 }
 
+/* =========================
+   Pedidos
+========================= */
+
+.product-options-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 9999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+}
+
+.product-options-box {
+    position: relative;
+
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+
+    overflow-y: auto;
+
+    background: #fff;
+    border-radius: 18px;
+
+    padding: 28px;
+
+    box-shadow: 0 20px 60px rgba(0,0,0,.3);
+}
+
+.product-options-close {
+    position: absolute;
+    right: 18px;
+    top: 14px;
+
+    width: 38px;
+    height: 38px;
+
+    border: 0;
+    border-radius: 50%;
+
+    background: #f1f1f1;
+
+    font-size: 26px;
+    cursor: pointer;
+}
+
+.product-options-box h2 {
+    margin: 0 50px 5px 0;
+    font-size: 25px;
+}
+
+.product-options-price {
+    margin-top: 0;
+    font-weight: bold;
+}
+
+.option-group {
+    margin-top: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.option-group-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 12px;
+}
+
+.option-group-header h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.option-group-header p {
+    margin: 5px 0 0;
+    color: #777;
+    font-size: 14px;
+}
+
+.option-group-header span {
+    font-size: 12px;
+    font-weight: bold;
+    color: #777;
+}
+
+.option-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 13px;
+
+    margin-bottom: 8px;
+
+    border: 1px solid #ddd;
+    border-radius: 10px;
+
+    cursor: pointer;
+}
+
+.option-item:hover {
+    background: #f8f8f8;
+}
+
+.option-item input {
+    width: 18px;
+    height: 18px;
+}
+
+.option-item-info {
+    flex: 1;
+}
+
+.option-item-info strong {
+    display: block;
+}
+
+.option-item-info small {
+    display: block;
+    margin-top: 3px;
+    color: #777;
+}
+
+.option-item-price {
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.product-options-footer {
+    position: sticky;
+    bottom: 0;
+
+    background: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding-top: 20px;
+    margin-top: 20px;
+
+    border-top: 1px solid #eee;
+}
+
+.product-options-add {
+    border: 0;
+    border-radius: 10px;
+
+    background: #111;
+    color: white;
+
+    padding: 14px 22px;
+
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* =========================================
+   MODAL DE OPÇÕES DO PRODUTO
+   ========================================= */
+
+#product-options-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* Fundo escuro */
+
+#product-options-modal .product-options-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 1;
+}
+
+
+/* Caixa do modal */
+
+#product-options-modal .product-options-dialog {
+    position: relative;
+    z-index: 2;
+
+    width: min(600px, calc(100% - 32px));
+    max-height: 90vh;
+
+    background: #ffffff;
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.30);
+
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* Botão fechar */
+
+#product-options-modal .product-options-close {
+    position: absolute;
+
+    top: 12px;
+    right: 14px;
+
+    width: 38px;
+    height: 38px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #f2f2f2;
+
+    color: #222;
+
+    font-size: 28px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    z-index: 5;
+}
+
+
+#product-options-modal .product-options-close:hover {
+    background: #e5e5e5;
+}
+
+
+/* Título */
+
+#product-options-modal .product-options-dialog > h2 {
+    margin: 0;
+
+    padding: 24px 60px 4px 24px;
+
+    font-size: 24px;
+    line-height: 1.2;
+}
+
+
+/* Preço */
+
+#product-options-modal .product-options-price {
+    margin: 0;
+
+    padding: 0 24px 18px;
+
+    font-size: 18px;
+    font-weight: 700;
+}
+
+
+/* Área das opções */
+
+#product-options-modal #product-options-content {
+    padding: 0 24px 20px;
+
+    overflow-y: auto;
+
+    flex: 1;
+}
+
+
+/* Grupo */
+
+#product-options-modal .product-option-group {
+    padding: 18px 0;
+
+    border-top: 1px solid #eeeeee;
+}
+
+
+/* Cabeçalho do grupo */
+
+#product-options-modal .product-option-group-header h3 {
+    margin: 0 0 6px;
+
+    font-size: 18px;
+}
+
+
+#product-options-modal .product-option-group-header p {
+    margin: 0 0 6px;
+
+    color: #666;
+
+    font-size: 14px;
+}
+
+
+#product-options-modal .product-option-group-header small {
+    display: block;
+
+    color: #777;
+
+    font-size: 13px;
+}
+
+
+/* Itens */
+
+#product-options-modal .product-option-items {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+
+    margin-top: 12px;
+}
+
+
+/* Cada acompanhamento */
+
+#product-options-modal .product-option-item {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    padding: 12px 14px;
+
+    border: 1px solid #e5e5e5;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    transition: background 0.15s ease,
+                border-color 0.15s ease;
+}
+
+
+#product-options-modal .product-option-item:hover {
+    background: #f8f8f8;
+
+    border-color: #cccccc;
+}
+
+
+/* Parte esquerda */
+
+#product-options-modal .product-option-main {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    min-width: 0;
+}
+
+
+/* Checkbox / radio */
+
+#product-options-modal .product-option-main input {
+    width: 18px;
+    height: 18px;
+
+    flex-shrink: 0;
+}
+
+
+/* Nome e descrição */
+
+#product-options-modal .product-option-main span {
+    display: flex;
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+
+#product-options-modal .product-option-main strong {
+    font-size: 15px;
+}
+
+
+#product-options-modal .product-option-main small {
+    color: #777;
+
+    font-size: 13px;
+}
+
+
+/* Preço do acompanhamento */
+
+#product-options-modal .product-option-price {
+    flex-shrink: 0;
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+
+/* Rodapé */
+
+#product-options-modal .product-options-footer {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+
+    padding: 18px 24px;
+
+    border-top: 1px solid #eeeeee;
+
+    background: #ffffff;
+}
+
+
+/* Total */
+
+#product-options-modal #product-options-total {
+    font-size: 17px;
+}
+
+
+/* Botão adicionar */
+
+#product-options-modal .product-options-confirm {
+    border: none;
+
+    border-radius: 10px;
+
+    padding: 13px 20px;
+
+    background: #111111;
+
+    color: #ffffff;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+}
+
+
+#product-options-modal .product-options-confirm:hover {
+    background: #000000;
+}
+
+
+/* =========================================
+   RESPONSIVO
+   ========================================= */
+
+@media (max-width: 600px) {
+
+    #product-options-modal .product-options-dialog {
+        width: calc(100% - 20px);
+
+        max-height: 92vh;
+
+        border-radius: 14px;
+    }
+
+
+    #product-options-modal .product-options-dialog > h2 {
+        font-size: 20px;
+
+        padding: 20px 55px 4px 18px;
+    }
+
+
+    #product-options-modal .product-options-price {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+
+    #product-options-modal #product-options-content {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+
+    #product-options-modal .product-options-footer {
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+
+    #product-options-modal .product-options-confirm {
+        width: 100%;
+    }
+
+}
+
+.cart-item-options {
+    margin-top: 8px;
+    padding: 8px 10px;
+
+    background: #f7f7f7;
+
+    border-radius: 8px;
+
+    font-size: 13px;
+}
+
+.cart-item-options > strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.cart-option {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+
+    margin-top: 3px;
+
+    color: #555;
+}
+
+.cart-item-base-price {
+    display: block;
+
+    margin-top: 4px;
+
+    font-size: 13px;
+
+    color: #777;
+}
 
 /* =========================
    RESPONSIVIDADE
