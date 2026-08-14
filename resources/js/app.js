@@ -578,18 +578,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (openCartButton && cartPanel && cartOverlay) {
 
-        openCartButton.addEventListener('click', () => {
+    openCartButton.addEventListener('click', () => {
 
-            renderCart();
+        renderCart();
 
-            cartPanel.classList.add('active');
+        loadOrderObservation();
 
-            cartOverlay.classList.add('active');
+        cartPanel.classList.add('active');
 
-        });
+        cartOverlay.classList.add('active');
 
-    }
+    });
 
+}
 
     if (closeCartButton && cartPanel && cartOverlay) {
 
@@ -651,6 +652,51 @@ function updateCartCount() {
 
     }
 
+}
+
+// ===============================
+// OBSERVAÇÃO GERAL DO PEDIDO
+// ===============================
+
+function loadOrderObservation() {
+
+    const field =
+        document.getElementById('order-observation');
+
+    const counter =
+        document.getElementById('order-observation-count');
+
+    if (!field) {
+        return;
+    }
+
+    const observation =
+        localStorage.getItem('orderObservation') || '';
+
+    field.value = observation;
+
+    if (counter) {
+        counter.textContent =
+            observation.length;
+    }
+
+    field.addEventListener('input', () => {
+
+        const value =
+            field.value.trimStart();
+
+        field.value = value;
+
+        localStorage.setItem(
+            'orderObservation',
+            value
+        );
+
+        if (counter) {
+            counter.textContent =
+                value.length;
+        }
+    });
 }
 
 

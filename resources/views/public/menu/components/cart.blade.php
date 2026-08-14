@@ -28,16 +28,34 @@
 
     <div class="cart-footer">
 
-        <strong id="cart-total">
-            Total: R$ 0,00
-        </strong>
+    <div class="cart-order-observation">
 
+        <label for="order-observation">
+            Observações do pedido
+            <span>(opcional)</span>
+        </label>
 
-        <button>
-            Finalizar pedido
-        </button>
+        <textarea
+            id="order-observation"
+            maxlength="500"
+            rows="3"
+            placeholder="Ex.: Entregar na portaria. Tocar a campainha. Troco para R$ 100."
+        ></textarea>
+
+        <div class="order-observation-counter">
+            <span id="order-observation-count">0</span>/500
+        </div>
 
     </div>
 
+            <strong id="cart-total">
+                Total: R$ 0,00
+            </strong>
+
+            <button type="button">
+                Finalizar pedido
+            </button>
+
+        </div>
 
 </div>
