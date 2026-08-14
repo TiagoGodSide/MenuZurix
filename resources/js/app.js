@@ -48,23 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             }
 
-            /*
-             * Produto sem opções:
-             * continua entrando diretamente no carrinho.
-             */
-            if (!optionGroups.length) {
-
-                addProductToCart(product);
-
-                return;
-
-            }
-
-            /*
-             * Produto com opções:
-             * abre a tela de personalização.
-             */
-            openProductOptionsModal(
+           openProductOptionsModal(
                 product,
                 optionGroups
             );
@@ -77,23 +61,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-function addProductToCart(product, options = []) {
+function addProductToCart(
+    product,
+    options = [],
+    observation = ''
+) {
 
     let cart = JSON.parse(
         localStorage.getItem('cart')
     ) || [];
 
+
+    observation =
+        String(observation || '').trim();
+
+
     const optionsPrice = options.reduce(
         (total, option) =>
             total + (
-                Number(option.additionalPrice)
-                * Number(option.quantity)
+                Number(option.additionalPrice || 0)
+                * Number(option.quantity || 1)
             ),
         0
     );
 
+
     const finalPrice =
         Number(product.price) + optionsPrice;
+
 
     const optionsKey = options
         .map(option =>
@@ -102,12 +97,21 @@ function addProductToCart(product, options = []) {
         .sort()
         .join('|');
 
+
+    const observationKey =
+        observation
+            .toLowerCase()
+            .replace(/\s+/g, ' ');
+
+
     const cartKey =
-        `${product.id}:${optionsKey}`;
+        `${product.id}:${optionsKey}:${observationKey}`;
+
 
     const existingProduct = cart.find(
         item => item.cartKey === cartKey
     );
+
 
     if (existingProduct) {
 
@@ -125,6 +129,8 @@ function addProductToCart(product, options = []) {
 
             options: options,
 
+            observation: observation,
+
             cartKey: cartKey,
 
             quantity: 1
@@ -133,16 +139,20 @@ function addProductToCart(product, options = []) {
 
     }
 
+
     localStorage.setItem(
         'cart',
         JSON.stringify(cart)
     );
 
+
     updateCartCount();
+
 
     showCartToast(
         'Adicionado ao pedido'
     );
+
 
     console.log(
         'Carrinho:',
@@ -187,10 +197,30 @@ function openProductOptionsModal(product, optionGroups) {
             </p>
 
             <div
-                id="product-options-content"
-            ></div>
+                        id="product-options-content"
+                    ></div>
 
-            <div class="product-options-footer">
+                    <div class="product-observation">
+
+                        <label for="product-observation-input">
+                            Observações
+                            <span>(opcional)</span>
+                        </label>
+
+                        <textarea
+                            id="product-observation-input"
+                            maxlength="250"
+                            rows="3"
+                            placeholder="Ex.: sem picles, sem cebola, molho à parte..."
+                        ></textarea>
+
+                        <small>
+                            <span id="product-observation-count">0</span>/250 caracteres
+                        </small>
+
+                    </div>
+
+                    <div class="product-options-footer">
 
                 <strong id="product-options-total">
                     Total: R$ ${Number(product.price).toFixed(2)}
@@ -214,6 +244,31 @@ function openProductOptionsModal(product, optionGroups) {
     const content = document.getElementById(
         'product-options-content'
     );
+
+    const observationInput =
+    document.getElementById(
+        'product-observation-input'
+    );
+
+    const observationCount =
+        document.getElementById(
+            'product-observation-count'
+        );
+
+
+    if (observationInput && observationCount) {
+
+        observationInput.addEventListener(
+            'input',
+            () => {
+
+                observationCount.textContent =
+                    observationInput.value.length;
+
+            }
+        );
+
+    }
 
     optionGroups.forEach((group, groupIndex) => {
 
@@ -382,9 +437,21 @@ function openProductOptionsModal(product, optionGroups) {
 
                 }
 
+                const observationInput =
+                    document.getElementById(
+                        'product-observation-input'
+                    );
+
+                const observation =
+                    observationInput
+                        ? observationInput.value.trim()
+                        : '';
+
+
                 addProductToCart(
                     product,
-                    selected
+                    selected,
+                    observation
                 );
 
                 modal.remove();
@@ -615,6 +682,17 @@ function showCartToast(message) {
 
 }
 
+function escapeHtml(value) {
+
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+
+}
+
 // ===============================
 // RENDERIZAR CARRINHO
 // ===============================
@@ -800,6 +878,25 @@ function renderCart() {
 
 
                     ${optionsHtml}
+
+
+                    ${
+                        item.observation
+                            ? `
+                                <div class="cart-item-observation">
+
+                                    <strong>
+                                        Observação:
+                                    </strong>
+
+                                    <span>
+                                        ${escapeHtml(item.observation)}
+                                    </span>
+
+                                </div>
+                            `
+                            : ''
+                    }
 
 
                     <span class="cart-item-subtotal">
